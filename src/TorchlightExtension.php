@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
 use TightenCo\Jigsaw\Events\EventBus;
 use TightenCo\Jigsaw\File\Filesystem;
+use Torchlight\Blade\CodeComponent;
 use Torchlight\Block;
 use Torchlight\Torchlight;
 use Torchlight\TorchlightServiceProvider;
@@ -52,13 +53,13 @@ class TorchlightExtension
 
     public function boot()
     {
-        $this->bindTorchlightIntoContainer();
         $this->configureStandaloneTorchlight();
         $this->hookIntoMarkdownParser();
         $this->registerFinalRenderFunction();
+        $this->registerBladeComponent();
     }
 
-    protected function bindTorchlightIntoContainer()
+    protected function configureStandaloneTorchlight()
     {
         // Set the root if it doesn't exist yet.
         if (!Facade::getFacadeApplication()) {
@@ -69,13 +70,7 @@ class TorchlightExtension
         // the Torchlight Facade references.
         $provider = new TorchlightServiceProvider($this->container);
         $provider->bindManagerSingleton();
-    }
 
-    /**
-     * Configure Torchlight to run without Laravel.
-     */
-    protected function configureStandaloneTorchlight()
-    {
         // There is no `config` helper, so we bind in a callback
         // that references the configuration on this class.
         Torchlight::getConfigUsing(function ($key, $default) {
@@ -120,6 +115,11 @@ class TorchlightExtension
         $this->events->afterBuild(function ($jigsaw) {
             $this->blocks->render($jigsaw);
         });
+    }
+
+    protected function registerBladeComponent()
+    {
+        $this->container['bladeCompiler']->component(CodeComponent::class, 'torchlight-code');
     }
 
     /**

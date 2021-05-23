@@ -7,6 +7,7 @@ namespace Torchlight\Jigsaw;
 
 use Illuminate\Support\Arr;
 use TightenCo\Jigsaw\Jigsaw;
+use Torchlight\Blade\BladeManager;
 use Torchlight\Block;
 use Torchlight\Torchlight;
 
@@ -14,6 +15,14 @@ class BlockManager
 {
     public $blocks = [];
 
+    /**
+     * @var Jigsaw $jigsaw
+     */
+    protected $jigsaw;
+
+    /**
+     * @param Block $block
+     */
     public function add(Block $block)
     {
         $this->blocks[$block->id()] = $block;
@@ -21,12 +30,25 @@ class BlockManager
 
     public function render(Jigsaw $jigsaw)
     {
-        // Send the request to the API.
-        Torchlight::highlight(array_values($this->blocks));
+        $this->jigsaw = $jigsaw;
 
+        // Merge all of the markdown blocks (the ones in this class)
+        // with any potential blade directive blocks, so that we
+        // can request them all from the API at once.
+        Torchlight::highlight(array_merge(
+            array_values($this->blocks),
+            BladeManager::getBlocks()
+        ));
+
+        $this->renderMarkdownCapturedBlocks();
+        $this->renderBladeDirectiveBlocks();
+    }
+
+    protected function renderMarkdownCapturedBlocks()
+    {
         // Grep the directory to find files that have Torchlight blocks.
         // No sense reg-exing through files that don't have blocks.
-        $files = $this->filesWithBlocks($jigsaw);
+        $files = $this->filesWithBlocks();
 
         foreach ($files as $file) {
             $contents = file_get_contents($file);
@@ -36,7 +58,7 @@ class BlockManager
 
             foreach ($elements as $element) {
                 // Grab the ID out of the placeholder so we can see if we have a block for it.
-                $torchlightId = $this->getCapturedGroup('/__torchlight-block-(.+)__/', $element);
+                $torchlightId = head(Torchlight::findTorchlightIds($element));
 
                 if (!$block = Arr::get($this->blocks, $torchlightId)) {
                     continue;
@@ -63,6 +85,20 @@ class BlockManager
         }
     }
 
+    protected function renderBladeDirectiveBlocks()
+    {
+        // Check again to see if there are any lingering `__torchlight-block-*`
+        // strings in any of the files. If there are, we'll process them
+        // through the Blade directive handler.
+        $files = $this->filesWithBlocks();
+
+        foreach ($files as $file) {
+            file_put_contents(
+                $file, BladeManager::renderContent(file_get_contents($file))
+            );
+        }
+    }
+
     protected function getCapturedGroup($pattern, $contents, $all = false)
     {
         $method = $all ? 'preg_match_all' : 'preg_match';
@@ -72,12 +108,12 @@ class BlockManager
         return Arr::get($matches, 1);
     }
 
-    protected function filesWithBlocks($jigsaw)
+    protected function filesWithBlocks()
     {
         // Recursively look for any blocks in the output
         // directory, returning only the paths.
         return explode(
-            "\n", trim(shell_exec("grep -l -r __torchlight-block- {$jigsaw->getDestinationPath()}/*"))
+            "\n", trim(shell_exec("grep -l -r __torchlight-block- {$this->jigsaw->getDestinationPath()}/*"))
         );
     }
 }
