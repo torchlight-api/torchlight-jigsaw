@@ -1,8 +1,18 @@
 {
     "name": "torchlight/torchlight-jigsaw",
     "description": "A Torchlight client for the static site generator Jigsaw",
+    "homepage": "https://torchlight.dev",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "markdown",
+        "syntax highlighting",
+        "code highlighting",
+        "jigsaw",
+        "laravel"
+    ],
     "require": {
-        "torchlight/laravel": "^0.2.1",
+        "torchlight/torchlight-laravel": "^0.3.0",
         "tightenco/jigsaw": "^1.3"
     },
     "require-dev": {
