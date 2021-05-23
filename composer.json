@@ -1,5 +1,5 @@
 {
-    "name": "torchlight/jigsaw",
+    "name": "torchlight/torchlight-jigsaw",
     "description": "A Torchlight client for the static site generator Jigsaw",
     "require": {
         "torchlight/laravel": "^0.2.1",
