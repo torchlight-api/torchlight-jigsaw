@@ -5,7 +5,6 @@
 
 namespace Torchlight\Jigsaw;
 
-
 use Illuminate\Support\Arr;
 use TightenCo\Jigsaw\Jigsaw;
 use Torchlight\Block;
@@ -37,7 +36,7 @@ class BlockManager
 
             foreach ($elements as $element) {
                 // Grab the ID out of the placeholder so we can see if we have a block for it.
-                $torchlightId = $this->getCapturedGroup("/__torchlight-block-(.+)__/", $element);
+                $torchlightId = $this->getCapturedGroup('/__torchlight-block-(.+)__/', $element);
 
                 if (!$block = Arr::get($this->blocks, $torchlightId)) {
                     continue;
@@ -46,8 +45,8 @@ class BlockManager
                 // ID and class are the only two attributes that the
                 // markdown extension supports, so those are the
                 // only ones we need to carry over.
-                $id = $this->getCapturedGroup("/id=\"(.+?)\"/", $element);
-                $classes = $this->getCapturedGroup("/class=\"(.+?)\"/", $element);
+                $id = $this->getCapturedGroup('/id="(.+?)"/', $element);
+                $classes = $this->getCapturedGroup('/class="(.+?)"/', $element);
 
                 $id = $id ? "id='$id'" : '';
                 // User defined classes + Torchlight classes from the API.
