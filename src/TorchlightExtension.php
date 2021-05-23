@@ -55,6 +55,7 @@ class TorchlightExtension
         $this->bindTorchlightIntoContainer();
         $this->configureStandaloneTorchlight();
         $this->hookIntoMarkdownParser();
+        $this->registerFinalRenderFunction();
     }
 
     protected function bindTorchlightIntoContainer()
@@ -81,14 +82,8 @@ class TorchlightExtension
             return Arr::get($this->config, $key, $default);
         });
 
-        // Set a instantiated cache instance.
+        // Set an instantiated cache instance.
         Torchlight::setCacheInstance($this->makeFileCache());
-
-        // Once everything is done, we need to put the fully
-        // highlighted code back in place.
-        $this->events->afterBuild(function ($jigsaw) {
-            $this->blocks->render($jigsaw);
-        });
     }
 
     /**
@@ -98,31 +93,33 @@ class TorchlightExtension
      */
     protected function hookIntoMarkdownParser()
     {
-        $this->container->extend('markdownParser', function ($markdown) {
-            $markdown->code_block_content_func = [$this, 'codeBlockContentFunction'];
+        $this->container['markdownParser']->code_block_content_func = function ($code, $language) {
+            // We have to undo the escaping that the Jigsaw Markdown handler does.
+            // See MarkdownHandler->getEscapedMarkdownContent.
+            $code = strtr($code, [
+                "<{{'?php'}}" => '<?php',
+                "{{'@'}}" => '@',
+                '@{{' => '{{',
+                '@{!!' => '{!!',
+            ]);
 
-            return $markdown;
-        });
+            $block = Block::make()->code($code)->language($language);
+
+            // Add it to our tracker.
+            $this->blocks->add($block);
+
+            // Leave our placeholder for replacing later.
+            return $block->placeholder();
+        };
     }
 
-    public function codeBlockContentFunction($code, $language)
+    protected function registerFinalRenderFunction()
     {
-        // We have to undo the escaping that the Jigsaw Markdown handler does.
-        // See MarkdownHandler->getEscapedMarkdownContent.
-        $code = strtr($code, [
-            "<{{'?php'}}" => '<?php',
-            "{{'@'}}" => '@',
-            '@{{' => '{{',
-            '@{!!' => '{!!',
-        ]);
-
-        $block = Block::make()->code($code)->language($language);
-
-        // Add it to our tracker.
-        $this->blocks->add($block);
-
-        // Leave our placeholder for replacing later.
-        return $block->placeholder();
+        // Once everything is done, we need to put the fully
+        // highlighted code back in place.
+        $this->events->afterBuild(function ($jigsaw) {
+            $this->blocks->render($jigsaw);
+        });
     }
 
     /**
