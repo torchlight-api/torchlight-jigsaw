@@ -32,7 +32,7 @@ class TorchlightExtension
      * @param null $config
      * @return static
      */
-    public static function boot(Container $container, EventBus $events, $config = null)
+    public static function make(Container $container, EventBus $events, $config = null)
     {
         return new static($container, $events, $config);
     }
@@ -47,9 +47,11 @@ class TorchlightExtension
         $this->container = $container;
         $this->events = $events;
         $this->blocks = new BlockManager;
-
         $this->config = $config ?? (array)$this->getConfigurationFromFile();
+    }
 
+    public function boot()
+    {
         $this->bindTorchlightIntoContainer();
         $this->configureStandaloneTorchlight();
         $this->hookIntoMarkdownParser();
