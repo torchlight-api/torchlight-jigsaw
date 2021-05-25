@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
 use TightenCo\Jigsaw\Events\EventBus;
 use TightenCo\Jigsaw\File\Filesystem;
+use Torchlight\Blade\BladeManager;
 use Torchlight\Blade\CodeComponent;
 use Torchlight\Block;
 use Torchlight\Torchlight;
@@ -75,6 +76,18 @@ class TorchlightExtension
         // that references the configuration on this class.
         Torchlight::getConfigUsing(function ($key, $default) {
             return Arr::get($this->config, $key, $default);
+        });
+
+        // Laravel before 8.23.0 has a bug that adds extra spaces around components.
+        // Obviously this is a problem if your component is wrapped in <pre></pre>
+        // tags, which ours usually is.
+        // See https://github.com/laravel/framework/blob/8.x/CHANGELOG-8.x.md#v8230-2021-01-19.
+        BladeManager::$affectedBySpacingBug = true;
+
+        // There is no `app()->environment` helper, so we need
+        // to tell Torchlight what environment we're in.
+        $this->events->beforeBuild(function ($jigsaw) {
+            Torchlight::overrideEnvironment($jigsaw->getEnvironment());
         });
 
         // Set an instantiated cache instance.

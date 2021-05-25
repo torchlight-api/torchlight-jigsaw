@@ -13,6 +13,9 @@ use Torchlight\Torchlight;
 
 class BlockManager
 {
+    /**
+     * @var array
+     */
     public $blocks = [];
 
     /**
@@ -37,7 +40,7 @@ class BlockManager
         // can request them all from the API at once.
         Torchlight::highlight(array_merge(
             array_values($this->blocks),
-            BladeManager::getBlocks()
+            array_values(BladeManager::getBlocks())
         ));
 
         $this->renderMarkdownCapturedBlocks();
@@ -60,6 +63,7 @@ class BlockManager
                 // Grab the ID out of the placeholder so we can see if we have a block for it.
                 $torchlightId = head(Torchlight::findTorchlightIds($element));
 
+                /** @var Block $block */
                 if (!$block = Arr::get($this->blocks, $torchlightId)) {
                     continue;
                 }

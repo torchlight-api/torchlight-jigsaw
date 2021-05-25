@@ -10,8 +10,8 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="Torchlight Jigsaw Test Suite">
-            <directory>tests</directory>
+        <testsuite name="main">
+            <file>tests</file>
         </testsuite>
     </testsuites>
     <filter>
