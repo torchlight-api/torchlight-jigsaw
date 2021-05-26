@@ -19,7 +19,7 @@ class BlockManager
     public $blocks = [];
 
     /**
-     * @var Jigsaw $jigsaw
+     * @var Jigsaw
      */
     protected $jigsaw;
 

@@ -31,7 +31,7 @@ class BaseTest extends TestCase
         /**
          * These next lines basically mimic the /vendor/bin/jigsaw.php file.
          */
-        require_once(realpath(__DIR__ . '/../vendor/tightenco/jigsaw/jigsaw-core.php'));
+        require_once realpath(__DIR__ . '/../vendor/tightenco/jigsaw/jigsaw-core.php');
 
         $this->app = new Application('Jigsaw', '1.3.37');
 
@@ -106,5 +106,4 @@ class BaseTest extends TestCase
 
         $this->assertTrue(file_exists(__DIR__ . '/Site/torchlight.php'));
     }
-
 }

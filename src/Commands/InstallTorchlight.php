@@ -5,14 +5,12 @@
 
 namespace Torchlight\Jigsaw\Commands;
 
-
 use Illuminate\Contracts\Container\Container;
 use TightenCo\Jigsaw\Console\Command;
 use TightenCo\Jigsaw\Console\ConsoleOutput;
 
 class InstallTorchlight extends Command
 {
-
     /**
      * @var Container
      */
@@ -68,6 +66,5 @@ return [
     'cache_path' => 'torchlight_cache',
 ];
 EOT;
-
     }
 }
