@@ -10,16 +10,21 @@ use Illuminate\Cache\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Traits\Macroable;
 use TightenCo\Jigsaw\Events\EventBus;
 use TightenCo\Jigsaw\File\Filesystem;
+use TightenCo\Jigsaw\Jigsaw;
 use Torchlight\Blade\BladeManager;
 use Torchlight\Blade\CodeComponent;
 use Torchlight\Block;
+use Torchlight\Jigsaw\Commands\InstallTorchlight;
 use Torchlight\Torchlight;
 use Torchlight\TorchlightServiceProvider;
 
 class TorchlightExtension
 {
+    use Macroable;
+
     public $container;
 
     public $events;
@@ -54,6 +59,8 @@ class TorchlightExtension
 
     public function boot()
     {
+        Jigsaw::registerCommand(InstallTorchlight::class);
+
         $this->configureStandaloneTorchlight();
         $this->hookIntoMarkdownParser();
         $this->registerFinalRenderFunction();
@@ -92,6 +99,10 @@ class TorchlightExtension
 
         // Set an instantiated cache instance.
         Torchlight::setCacheInstance($this->makeFileCache());
+
+        if (self::hasMacro('afterStandaloneConfiguration')) {
+            $this->afterStandaloneConfiguration();
+        }
     }
 
     /**
@@ -132,7 +143,9 @@ class TorchlightExtension
 
     protected function registerBladeComponent()
     {
-        $this->container['bladeCompiler']->component(CodeComponent::class, 'torchlight-code');
+        if (Torchlight::config('blade_components')) {
+            $this->container['bladeCompiler']->component(CodeComponent::class, 'torchlight-code');
+        }
     }
 
     /**

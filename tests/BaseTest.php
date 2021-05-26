@@ -9,9 +9,10 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Input\StringInput;
 use TightenCo\Jigsaw\Console\BuildCommand;
 use TightenCo\Jigsaw\Jigsaw;
+use Torchlight\Jigsaw\TorchlightExtension;
+use Torchlight\Torchlight;
 
 class BaseTest extends TestCase
 {
@@ -19,19 +20,13 @@ class BaseTest extends TestCase
 
     protected $container;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->prepareForBuilding();
-    }
-
     protected function prepareForBuilding()
     {
         $sitePath = __DIR__ . '/Site';
 
         // Clear out the old build directory
         exec("rm -rf $sitePath/build_testing");
+        exec("rm $sitePath/torchlight.php");
 
         /**
          * These next lines basically mimic the /vendor/bin/jigsaw.php file.
@@ -80,6 +75,15 @@ class BaseTest extends TestCase
     /** @test */
     public function most_of_the_tests_are_here()
     {
+        TorchlightExtension::macro('afterStandaloneConfiguration', function () {
+            Torchlight::getConfigUsing([
+                'blade_components' => true,
+                'token' => 'token'
+            ]);
+        });
+
+        $this->prepareForBuilding();
+
         Http::fake();
 
         $this->build();
@@ -92,4 +96,15 @@ class BaseTest extends TestCase
         $this->assertSnapshotMatches('one-component');
         $this->assertSnapshotMatches('two-components');
     }
+
+    /** @test */
+    public function test_publish_command()
+    {
+        $this->assertFalse(file_exists(__DIR__ . '/Site/torchlight.php'));
+
+        exec('cd ' . __DIR__ . '/Site && ./vendor/bin/jigsaw torchlight:install');
+
+        $this->assertTrue(file_exists(__DIR__ . '/Site/torchlight.php'));
+    }
+
 }
