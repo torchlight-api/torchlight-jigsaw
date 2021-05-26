@@ -4,7 +4,7 @@
 
 A [Torchlight](https://torchlight.dev) syntax highlighting extension for the static site builder [Jigsaw](https://jigsaw.tighten.co/).
 
-Torchlight is a VS Code compatible syntax highlighter that requires no JavaScript, supports every language, every VS Code theme, line highlighting, git diffing, and more.
+Torchlight is a VS Code-compatible syntax highlighter that requires no JavaScript, supports every language, every VS Code theme, line highlighting, git diffing, and more.
 
 ## Installation
 
@@ -100,5 +100,5 @@ You can change the host where your API requests are sent. Not sure why you'd eve
 
 ### Cache
 
-Torchlight requires a separate cache path, distinct from the Jigsaw cache. Jigsaw cleans out its cache from time to time, whereas Torchlight relies expiration, courtesy of the Laravel cache driver. 
+Torchlight requires a separate cache path, distinct from the Jigsaw cache. Jigsaw cleans out its cache from time to time, whereas Torchlight depends on individual TTLs, courtesy of the Laravel cache driver. 
 
