@@ -20,3 +20,5 @@ CVS
 /vendor/
 composer.lock
 .phpunit.result.cache
+tests/Site/build_testing/
+
