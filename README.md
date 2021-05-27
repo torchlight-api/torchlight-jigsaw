@@ -105,9 +105,10 @@ Torchlight requires a separate cache path, distinct from the Jigsaw cache. Jigsa
 
 ## Usage
 
+### Markdown
 To use Torchlight in your Jigsaw markdown files, you don't need to do anything else beside using fenced code blocks like you have been.
 
-```markdown
+~~~markdown
 This is my great markdown file! I'm going to show some code now:
 
 ```php
@@ -115,11 +116,11 @@ echo "here is my code"
 ```
 
 Wasn't that good code?
-```
+~~~
 
 Torchlight will handle highlighting that block of code now. If you want to add additional classes or an ID, you can use the syntax that is supported by Jigsaw's [underlying markdown parser](https://github.com/michelf/php-markdown).
 
-```markdown
+~~~markdown
 This is my great markdown file! I'm going to show some code now:
 
 ```php {#some-html-id.mt-4.mb-8}
@@ -127,6 +128,9 @@ echo "here is my code"
 ```
 
 Wasn't that good code?
-```
+~~~
 
 The resulting code block will have an id of `some-html-id` and classes of `mt-4 mb-8`, along with any classes that Torchlight applies.
+
+### Blade
+
