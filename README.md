@@ -118,7 +118,9 @@ echo "here is my code"
 Wasn't that good code?
 ~~~
 
-Torchlight will handle highlighting that block of code now. If you want to add additional classes or an ID, you can use the syntax that is supported by Jigsaw's [underlying markdown parser](https://github.com/michelf/php-markdown).
+Torchlight will handle highlighting that block of code. 
+
+If you want to add additional classes or an ID, you can use the syntax that is supported by Jigsaw's [underlying markdown parser](https://github.com/michelf/php-markdown).
 
 ~~~markdown
 This is my great markdown file! I'm going to show some code now:
@@ -130,7 +132,23 @@ echo "here is my code"
 Wasn't that good code?
 ~~~
 
-The resulting code block will have an id of `some-html-id` and classes of `mt-4 mb-8`, along with any classes that Torchlight applies.
+The resulting `code` element will have an id of `some-html-id` and classes of `mt-4 mb-8`, along with any classes that Torchlight applies.
 
 ### Blade
+
+If you want to use Torchlight in your `.blade.php` files, you can use the custom blade component `x-torchlight-code`.
+
+```blade
+<pre><x-torchlight-code language='php'>
+    echo "hello world";
+</x-torchlight-code></pre>
+```
+
+You can add any classes or other attributes, and they will be preserved:
+
+```blade
+<pre><x-torchlight-code id='hello-world' class='mt-4 mb-8' language='php'>
+    echo "hello world";
+</x-torchlight-code></pre>
+```
 
