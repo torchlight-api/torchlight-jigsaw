@@ -102,3 +102,31 @@ You can change the host where your API requests are sent. Not sure why you'd eve
 
 Torchlight requires a separate cache path, distinct from the Jigsaw cache. Jigsaw cleans out its cache from time to time, whereas Torchlight depends on individual TTLs, courtesy of the Laravel cache driver. 
 
+
+## Usage
+
+To use Torchlight in your Jigsaw markdown files, you don't need to do anything else beside using fenced code blocks like you have been.
+
+```markdown
+This is my great markdown file! I'm going to show some code now:
+
+```php
+echo "here is my code"
+```
+
+Wasn't that good code?
+```
+
+Torchlight will handle highlighting that block of code now. If you want to add additional classes or an ID, you can use the syntax that is supported by Jigsaw's [underlying markdown parser](https://github.com/michelf/php-markdown).
+
+```markdown
+This is my great markdown file! I'm going to show some code now:
+
+```php {#some-html-id.mt-4.mb-8}
+echo "here is my code"
+```
+
+Wasn't that good code?
+```
+
+The resulting code block will have an id of `some-html-id` and classes of `mt-4 mb-8`, along with any classes that Torchlight applies.
