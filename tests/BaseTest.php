@@ -24,14 +24,20 @@ class BaseTest extends TestCase
     {
         $sitePath = __DIR__ . '/Site';
 
-        // Clear out the old build directory
-        exec("rm -rf $sitePath/build_testing");
-        exec("rm $sitePath/torchlight.php");
+        // Clear out the old build directory.
+        if (is_dir("$sitePath/build_testing")) {
+            exec("rm -rf $sitePath/build_testing");
+        }
+
+        // Clear the old config.
+        if (file_exists("$sitePath/torchlight.php")) {
+            exec("rm $sitePath/torchlight.php");
+        }
 
         /**
          * These next lines basically mimic the /vendor/bin/jigsaw.php file.
          */
-        require_once realpath(__DIR__ . '/../vendor/tightenco/jigsaw/jigsaw-core.php');
+        require realpath(__DIR__ . '/../vendor/tightenco/jigsaw/jigsaw-core.php');
 
         $this->app = new Application('Jigsaw', '1.3.37');
 
@@ -57,11 +63,13 @@ class BaseTest extends TestCase
         include "$sitePath/bootstrap.php";
     }
 
-    protected function build()
+    protected function build($source = 'source')
     {
         // Turn off the Jigsaw progress bars.
         $this->container->consoleOutput->setup($verbosity = -1);
-        $this->container->make(Jigsaw::class)->build('testing');
+        $jigsaw = $this->container->make(Jigsaw::class);
+        $jigsaw->setSourcePath(__DIR__ . "/Site/$source");
+        $jigsaw->build('testing');
     }
 
     protected function assertSnapshotMatches($file)
@@ -95,6 +103,24 @@ class BaseTest extends TestCase
         $this->assertSnapshotMatches('non-existent-id');
         $this->assertSnapshotMatches('one-component');
         $this->assertSnapshotMatches('two-components');
+    }
+
+    /** @test */
+    public function no_blocks_doesnt_create_an_error()
+    {
+        TorchlightExtension::macro('afterStandaloneConfiguration', function () {
+            Torchlight::getConfigUsing([
+                'blade_components' => true,
+                'token' => 'token'
+            ]);
+        });
+
+        $this->prepareForBuilding();
+        $this->build('source-2');
+
+        // Before the fix, building source-2 would throw an
+        // exception, so we just need to make sure we got here.
+        $this->assertTrue(true);
     }
 
     /** @test */
