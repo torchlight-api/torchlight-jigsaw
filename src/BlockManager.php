@@ -116,8 +116,11 @@ class BlockManager
     {
         // Recursively look for any blocks in the output
         // directory, returning only the paths.
-        return explode(
+        $output = explode(
             "\n", trim(shell_exec("grep -l -r __torchlight-block- {$this->jigsaw->getDestinationPath()}/*"))
         );
+
+        // Filter out empty values caused by our grep query.
+        return array_filter($output);
     }
 }
