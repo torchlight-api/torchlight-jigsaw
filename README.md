@@ -100,7 +100,9 @@ You can change the host where your API requests are sent. Not sure why you'd eve
 
 ### Cache
 
-Torchlight requires a separate cache path, distinct from the Jigsaw cache. Jigsaw cleans out its cache from time to time, whereas Torchlight depends on individual TTLs, courtesy of the Laravel cache driver. 
+Torchlight requires a separate cache path, distinct from the Jigsaw cache. Jigsaw cleans out its cache from time to time, whereas Torchlight depends on individual TTLs, courtesy of the Laravel cache driver.
+
+> You may want to add your configured cache path (`/torchlight_cache/`) to your `.gitignore` file so the cache files aren't persisted to your git history.
 
 
 ## Usage
