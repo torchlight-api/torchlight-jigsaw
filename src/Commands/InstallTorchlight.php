@@ -51,8 +51,9 @@ return [
     // https://torchlight.dev/themes, or you can provide your own.
     'theme' => 'material-theme-palenight',
 
-    // Your API token from torchlight.dev.
-    'token' => '',
+    // Your API token from torchlight.dev. You can set it as an ENV variable
+    // (shown below), or just hardcode it if your repo is private.  
+    'token' => getenv('TORCHLIGHT_API_TOKEN'),
 
     // If you want to register the blade directives, set this to true.
     'blade_components' => true,
