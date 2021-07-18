@@ -65,6 +65,11 @@ return [
     // that you should *not* use the same path that Jigsaw uses,
     // which is `cache` at the root level of your app.
     'cache_path' => 'torchlight_cache',
+    
+    // Because of the way Jigsaw works as a static site generator, all the 
+    // code blocks for your entire site will be sent as one request. We 
+    // increase the timeout to 15 seconds to cover for that.
+    'request_timeout' => 15
 ];
 EOT;
     }

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.1.2 - 2021-07-18
+
+### Changed
+- Increase the default timeout to 15 seconds to cover large Jigsaw sites.
+
 ## 0.1.1 - 2021-06-17
 
 ### Changed
