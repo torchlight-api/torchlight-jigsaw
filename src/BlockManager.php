@@ -74,12 +74,13 @@ class BlockManager
                 $id = $this->getCapturedGroup('/id="(.+?)"/', $element);
                 $classes = $this->getCapturedGroup('/class="(.+?)"/', $element);
 
-                $id = $id ? "id='$id'" : '';
+                $id = $id ? " id='$id'" : '';
+
                 // User defined classes + Torchlight classes from the API.
                 $classes = trim("$classes $block->classes");
 
                 // Build up a new element.
-                $html = "<pre><code $id class='{$classes}' style='{$block->styles}'>{$block->highlighted}</code></pre>";
+                $html = "<pre><code{$id} class='{$classes}' style='{$block->styles}'>{$block->highlighted}</code></pre>";
 
                 // Finally swap the old element for the new, highlighted one.
                 $contents = str_replace($element, $html, $contents);
