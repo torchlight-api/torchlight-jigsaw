@@ -69,7 +69,28 @@ return [
     // Because of the way Jigsaw works as a static site generator, all the 
     // code blocks for your entire site will be sent as one request. We 
     // increase the timeout to 15 seconds to cover for that.
-    'request_timeout' => 15
+    'request_timeout' => 15,
+    
+    // Global options to control blocks-level settings.
+    // https://torchlight.dev/docs/options
+    'options' => [
+        // Turn line numbers on or off globally.
+        'lineNumbers' => true,
+
+        // Control the `style` attribute applied to line numbers.
+        // 'lineNumbersStyle' => '',
+
+        // Turn on +/- diff indicators.
+        'diffIndicators' => true,
+
+        // If there are any diff indicators for a line, put them
+        // in place of the line number to save horizontal space.
+        'diffIndicatorsInPlaceOfLineNumbers' => true,
+
+        // When lines are collapsed, this is the text that will
+        // be shown to indicate that they can be expanded.
+        // 'summaryCollapsedIndicator' => '...',
+    ]
 ];
 EOT;
     }
