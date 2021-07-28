@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.1.3 - 2021-07-28
+
+### Added
+- Added the ability to send `options` from the config file to the API.
+
+### Changed
+- Bumped minimum version of `torchlight/torchlight-laravel` to `0.4.6`
+
 ## 0.1.2 - 2021-07-18
 
 ### Changed
