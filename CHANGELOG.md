@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.2.0 - 2021-08-02
+
+### Changed
+- Bumped minimum version of `torchlight/torchlight-laravel` to `0.5.0`
+
 ## 0.1.3 - 2021-07-28
 
 ### Added
