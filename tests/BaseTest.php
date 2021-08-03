@@ -98,7 +98,6 @@ class BaseTest extends TestCase
 
         Http::assertSentCount(1);
 
-
         Http::assertSent(function ($request) {
             $blocks = $request['blocks'];
             foreach ($blocks as $block) {
