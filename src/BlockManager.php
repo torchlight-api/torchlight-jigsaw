@@ -6,6 +6,7 @@
 namespace Torchlight\Jigsaw;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use TightenCo\Jigsaw\Jigsaw;
 use Torchlight\Blade\BladeManager;
 use Torchlight\Block;
@@ -70,7 +71,7 @@ class BlockManager
 
             foreach ($elements as $element) {
                 // These are Blade directives, which will be handled later.
-                if (str_contains($element, '##PRE_TL_COMPONENT##')) {
+                if (Str::contains($element, '##PRE_TL_COMPONENT##')) {
                     continue;
                 }
 
