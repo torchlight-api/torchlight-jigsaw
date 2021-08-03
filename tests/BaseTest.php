@@ -98,6 +98,19 @@ class BaseTest extends TestCase
 
         Http::assertSentCount(1);
 
+
+        Http::assertSent(function ($request) {
+            $blocks = $request['blocks'];
+            foreach ($blocks as $block) {
+                if ($block['language'] === 'json' && $block['theme'] === 'github-light') {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        $this->assertSnapshotMatches('can-set-a-theme');
         $this->assertSnapshotMatches('attributes-get-carried-over');
         $this->assertSnapshotMatches('jigsaw-escapes-get-fixed');
         $this->assertSnapshotMatches('non-existent-id');

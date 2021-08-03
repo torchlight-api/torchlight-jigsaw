@@ -122,7 +122,15 @@ class TorchlightExtension
                 '@{!!' => '{!!',
             ]);
 
+            // Split the language definition into language + theme, as this is
+            // the only way in Jigsaw to specify a custom theme per block.
+            list($language, $theme) = $this->splitLanguageAndTheme($language);
+
             $block = Block::make()->code($code)->language($language);
+
+            if ($theme) {
+                $block->theme($theme);
+            }
 
             // Add it to our tracker.
             $this->blocks->add($block);
@@ -130,6 +138,15 @@ class TorchlightExtension
             // Leave our placeholder for replacing later.
             return $block->placeholder();
         };
+    }
+
+    protected function splitLanguageAndTheme($language)
+    {
+        $parts = explode(':', $language);
+        $language = $parts[0];
+        $theme = isset($parts[1]) ? $parts[1] : null;
+
+        return [$language, $theme];
     }
 
     protected function registerFinalRenderFunction()

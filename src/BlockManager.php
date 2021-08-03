@@ -66,9 +66,14 @@ class BlockManager
             $contents = file_get_contents($file);
 
             // Gather up all of the <pre> elements.
-            $elements = $this->getCapturedGroup("/\n(<pre(?:.+)<\/pre>)\n/", $contents, $all = true);
+            $elements = $this->getCapturedGroup("/(<pre(?:.+)<\/pre>)/", $contents, $all = true);
 
             foreach ($elements as $element) {
+                // These are Blade directives, which will be handled later.
+                if (str_contains($element, '##PRE_TL_COMPONENT##')) {
+                    continue;
+                }
+
                 // Grab the ID out of the placeholder so we can see if we have a block for it.
                 $torchlightId = head(Torchlight::findTorchlightIds($element));
 
@@ -82,6 +87,12 @@ class BlockManager
                 // only ones we need to carry over.
                 $id = $this->getCapturedGroup('/id="(.+?)"/', $element);
                 $classes = $this->getCapturedGroup('/class="(.+?)"/', $element);
+
+                // To allow Jigsaw authors to specify a theme per block, we have
+                // a convention of `lang:theme`, e.g. `php:github-light`. Here
+                // we need to strip the theme off of the class the the
+                // markdown renderer applies.
+                $classes = $this->replaceThemeFromLanguage($classes);
 
                 $id = $id ? " id='$id'" : '';
 
@@ -111,6 +122,19 @@ class BlockManager
                 $file, BladeManager::renderContent(file_get_contents($file))
             );
         }
+    }
+
+    protected function replaceThemeFromLanguage($classes)
+    {
+        $pattern = '/(language-(?:.+?)):([\w-]+)/';
+
+        preg_match($pattern, $classes, $matches);
+
+        if (count($matches) === 3) {
+            $classes = str_replace($matches[0], $matches[1], $classes);
+        }
+
+        return $classes;
     }
 
     protected function getCapturedGroup($pattern, $contents, $all = false)
