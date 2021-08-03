@@ -29,7 +29,6 @@ Now your `bootstrap.php` might look something like this:
 
 use App\Listeners\GenerateSitemap;
 use TightenCo\Jigsaw\Jigsaw;
-use Torchlight\Jigsaw\TorchlightExtension;
 
 /** @var $container \Illuminate\Container\Container */
 /** @var $events \TightenCo\Jigsaw\Events\EventBus */
@@ -47,7 +46,7 @@ use Torchlight\Jigsaw\TorchlightExtension;
 
 $events->afterBuild(GenerateSitemap::class);
 
-TorchlightExtension::make($container, $events)->boot();
+Torchlight\Jigsaw\TorchlightExtension::make($container, $events)->boot();
 ```
 
 ## Configuration
