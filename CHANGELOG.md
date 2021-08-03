@@ -2,12 +2,10 @@
 
 ## Unreleased
 
-## 0.2.2 - 2021-08-03
-
-### Changed
-- Add option to set theme per block by adding `lang:theme` e.g. `php:github-light` in markdown.
-
 ## 0.2.1 - 2021-08-03
+
+### Added
+- Add option to set theme per block by adding `lang:theme` e.g. `php:github-light` in markdown.
 
 ### Changed
 - Chunk blocks into groups of 50, since Jigsaw sites can be massive.
