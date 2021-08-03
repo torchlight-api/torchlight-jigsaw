@@ -6,6 +6,8 @@ A [Torchlight](https://torchlight.dev) syntax highlighting extension for the sta
 
 Torchlight is a VS Code-compatible syntax highlighter that requires no JavaScript, supports every language, every VS Code theme, line highlighting, git diffing, and more.
 
+> 📚 The full docs can be found at [torchlight.dev/docs/clients/jigsaw](https://torchlight.dev/docs/clients/jigsaw).
+
 ## Installation
 
 To install, require the package from composer:

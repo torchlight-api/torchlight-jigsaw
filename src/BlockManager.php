@@ -38,10 +38,19 @@ class BlockManager
         // Merge all of the markdown blocks (the ones in this class)
         // with any potential blade directive blocks, so that we
         // can request them all from the API at once.
-        Torchlight::highlight(array_merge(
+        $blocks = array_merge(
             array_values($this->blocks),
             array_values(BladeManager::getBlocks())
-        ));
+        );
+
+        // Jigsaw sites can be huge, so we'll split the entirety
+        // of the blocks into chunks of 50 since time is not
+        // an issue when building locally.
+        $chunks = array_chunk($blocks, 50);
+
+        foreach ($chunks as $chunk) {
+            Torchlight::highlight($chunk);
+        }
 
         $this->renderMarkdownCapturedBlocks();
         $this->renderBladeDirectiveBlocks();

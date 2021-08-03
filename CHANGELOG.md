@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.2.1 - 2021-08-03
+
+### Changed
+- Chunk blocks into groups of 50, since Jigsaw sites can be massive.
+
 ## 0.2.0 - 2021-08-02
 
 ### Changed
