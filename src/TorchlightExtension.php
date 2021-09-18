@@ -91,10 +91,12 @@ class TorchlightExtension
         // See https://github.com/laravel/framework/blob/8.x/CHANGELOG-8.x.md#v8230-2021-01-19.
         BladeManager::$affectedBySpacingBug = true;
 
-        // There is no `app()->environment` helper, so we need
-        // to tell Torchlight what environment we're in.
-        $this->events->beforeBuild(function ($jigsaw) {
-            Torchlight::overrideEnvironment($jigsaw->getEnvironment());
+        // There is no `app()->environment` helper, so we need to tell Torchlight what
+        // environment we're in. Hardcode the environment to a non "production" build
+        // because this is a build tool. If a request fails while building the
+        // production site, we need to notify the developer.
+        $this->events->beforeBuild(function () {
+            Torchlight::overrideEnvironment('build');
         });
 
         // Set an instantiated cache instance.

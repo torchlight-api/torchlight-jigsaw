@@ -11,6 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use TightenCo\Jigsaw\Console\BuildCommand;
 use TightenCo\Jigsaw\Jigsaw;
+use Torchlight\Jigsaw\Exceptions\UnrenderedBlockException;
 use Torchlight\Jigsaw\TorchlightExtension;
 use Torchlight\Torchlight;
 
@@ -46,7 +47,8 @@ class BaseTest extends TestCase
 
         $this->container->instance('cwd', $sitePath);
         $this->container->buildPath = [
-            'source' => "$sitePath/source",
+            'source' => $sitePath,
+            'views' => $sitePath,
             'destination' => "$sitePath/build_testing",
         ];
 
@@ -63,7 +65,7 @@ class BaseTest extends TestCase
         include "$sitePath/bootstrap.php";
     }
 
-    protected function build($source = 'source')
+    protected function build($source = 'source-1')
     {
         // Turn off the Jigsaw progress bars.
         $this->container->consoleOutput->setup($verbosity = -1);
@@ -112,7 +114,6 @@ class BaseTest extends TestCase
         $this->assertSnapshotMatches('can-set-a-theme');
         $this->assertSnapshotMatches('attributes-get-carried-over');
         $this->assertSnapshotMatches('jigsaw-escapes-get-fixed');
-        $this->assertSnapshotMatches('non-existent-id');
         $this->assertSnapshotMatches('one-component');
         $this->assertSnapshotMatches('two-components');
         $this->assertSnapshotMatches('code-indents-work');
@@ -135,6 +136,47 @@ class BaseTest extends TestCase
         // exception, so we just need to make sure we got here.
         $this->assertTrue(true);
     }
+
+    /** @test */
+    public function non_existent_block_throws()
+    {
+        TorchlightExtension::macro('afterStandaloneConfiguration', function () {
+            Torchlight::getConfigUsing([
+                'blade_components' => true,
+                'token' => 'token'
+            ]);
+        });
+
+        $this->prepareForBuilding();
+
+        try {
+            $this->build('source-3');
+        } catch (UnrenderedBlockException $e) {
+            return $this->assertTrue(true);
+        }
+
+        $this->assertTrue(false);
+    }
+
+    /** @test */
+    public function expected_non_existent_block_is_fine()
+    {
+        TorchlightExtension::macro('afterStandaloneConfiguration', function () {
+            Torchlight::getConfigUsing([
+                'blade_components' => true,
+                'token' => 'token',
+                'ignore_leftover_ids' => [
+                    'fake_id'
+                ]
+            ]);
+        });
+
+        $this->prepareForBuilding();
+
+        $this->build('source-3');
+        $this->assertTrue(true);
+    }
+
 
     /** @test */
     public function test_publish_command()

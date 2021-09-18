@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use TightenCo\Jigsaw\Jigsaw;
 use Torchlight\Blade\BladeManager;
 use Torchlight\Block;
+use Torchlight\Jigsaw\Exceptions\UnrenderedBlockException;
 use Torchlight\Torchlight;
 
 class BlockManager
@@ -55,6 +56,57 @@ class BlockManager
 
         $this->renderMarkdownCapturedBlocks();
         $this->renderBladeDirectiveBlocks();
+        $this->scanForLeftovers();
+    }
+
+    protected function scanForLeftovers()
+    {
+        // Grep the directory to find files that have Torchlight blocks.
+        // No sense reg-exing through files that don't have blocks.
+        $files = $this->filesWithBlocks();
+
+        $leftovers = [];
+        $ignore = Torchlight::config('ignore_leftover_ids', []);
+
+        foreach ($files as $file) {
+            $contents = file_get_contents($file);
+
+            $ids = array_diff(Torchlight::findTorchlightIds($contents), $ignore);
+
+            if ($ids) {
+                $leftovers[$file] = $ids;
+            }
+        }
+
+        if (!$leftovers) {
+            return;
+        }
+
+        $output = <<<EOT
+
+-----------------------------------------------------------------------------
+ Some Torchlight blocks were not replaced. They are listed below. If you're 
+ aware of this and would like to ignore any of these blocks, you may add 
+ their IDs to a "ignore_leftover_ids" array in your Torchlight configuration.
+
+ If you believe this is a bug, please let us know 
+ at github.com/torchlight-api/torchlight-jigsaw.
+-----------------------------------------------------------------------------
+
+
+EOT;
+
+        foreach ($leftovers as $file => $ids) {
+            $output .= " File: $file \n IDs: \n";
+
+            foreach ($ids as $id) {
+                $output .= "    - $id \n";
+            }
+        }
+
+        echo $output;
+
+        throw new UnrenderedBlockException('Unrendered Torchlight blocks found.');
     }
 
     protected function renderMarkdownCapturedBlocks()
@@ -68,7 +120,7 @@ class BlockManager
 
             // Gather up all of the <pre> elements.
             $elements = array_merge(
-                // This one captures regular fenced code blocks.
+            // This one captures regular fenced code blocks.
                 $this->getCapturedGroup("/(<pre(?:.+)<\/pre>)/", $contents, $all = true),
                 // This one captures indented code blocks, which are weirdly different for some reason.
                 $this->getCapturedGroup("/(<pre><code>(?:.+)\n<\/code><\/pre>)/", $contents, $all = true)
