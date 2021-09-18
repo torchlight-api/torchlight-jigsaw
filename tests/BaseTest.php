@@ -115,6 +115,7 @@ class BaseTest extends TestCase
         $this->assertSnapshotMatches('non-existent-id');
         $this->assertSnapshotMatches('one-component');
         $this->assertSnapshotMatches('two-components');
+        $this->assertSnapshotMatches('code-indents-work');
     }
 
     /** @test */

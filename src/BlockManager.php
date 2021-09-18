@@ -67,7 +67,12 @@ class BlockManager
             $contents = file_get_contents($file);
 
             // Gather up all of the <pre> elements.
-            $elements = $this->getCapturedGroup("/(<pre(?:.+)<\/pre>)/", $contents, $all = true);
+            $elements = array_merge(
+                // This one captures regular fenced code blocks.
+                $this->getCapturedGroup("/(<pre(?:.+)<\/pre>)/", $contents, $all = true),
+                // This one captures indented code blocks, which are weirdly different for some reason.
+                $this->getCapturedGroup("/(<pre><code>(?:.+)\n<\/code><\/pre>)/", $contents, $all = true)
+            );
 
             foreach ($elements as $element) {
                 // These are Blade directives, which will be handled later.
