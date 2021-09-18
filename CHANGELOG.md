@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.2.2 - 2021-09-18
+
+### Fix
+- Code blocks that were indented instead of fenced did not get replaced. They do now!   
+
 ## 0.2.1 - 2021-08-03
 
 ### Added
