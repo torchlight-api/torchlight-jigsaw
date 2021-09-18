@@ -177,7 +177,6 @@ class BaseTest extends TestCase
         $this->assertTrue(true);
     }
 
-
     /** @test */
     public function test_publish_command()
     {

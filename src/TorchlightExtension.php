@@ -34,9 +34,9 @@ class TorchlightExtension
     public $config = [];
 
     /**
-     * @param Container $container
-     * @param EventBus $events
-     * @param null $config
+     * @param  Container  $container
+     * @param  EventBus  $events
+     * @param  null  $config
      * @return static
      */
     public static function make(Container $container, EventBus $events, $config = null)
@@ -45,9 +45,9 @@ class TorchlightExtension
     }
 
     /**
-     * @param Container $container
-     * @param EventBus $events
-     * @param null|array $config
+     * @param  Container  $container
+     * @param  EventBus  $events
+     * @param  null|array  $config
      */
     public function __construct(Container $container, EventBus $events, $config = null)
     {

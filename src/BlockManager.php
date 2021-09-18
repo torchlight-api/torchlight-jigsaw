@@ -26,7 +26,7 @@ class BlockManager
     protected $jigsaw;
 
     /**
-     * @param Block $block
+     * @param  Block  $block
      */
     public function add(Block $block)
     {

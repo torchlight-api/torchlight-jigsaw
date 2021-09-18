@@ -5,10 +5,8 @@
 
 namespace Torchlight\Jigsaw\Exceptions;
 
-
 use Exception;
 
 class UnrenderedBlockException extends Exception
 {
-
 }
