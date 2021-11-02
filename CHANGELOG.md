@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.3.1 - 2021-11-02
+
+### Added
+- Add some public hooks that let a developer insert their own blocks.
+
 ## 0.3.0 - 2021-09-18
 
 ### Changed
