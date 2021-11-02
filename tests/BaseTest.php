@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use TightenCo\Jigsaw\Console\BuildCommand;
 use TightenCo\Jigsaw\Jigsaw;
-use Torchlight\Blade\BladeManager;
 use Torchlight\Block;
 use Torchlight\Jigsaw\Exceptions\UnrenderedBlockException;
 use Torchlight\Jigsaw\TorchlightExtension;
@@ -202,7 +201,6 @@ class BaseTest extends TestCase
             $block = Block::make('id')->code('foo')->language('html');
 
             TorchlightExtension::instance()->addBlock($block);
-
         });
 
         $this->prepareForBuilding();
@@ -213,7 +211,7 @@ class BaseTest extends TestCase
                     'id' => 'id',
                     'classes' => 'torchlight',
                     'styles' => 'background-color: #000000;',
-                    'wrapped' => "<pre><code>highlighted</code></pre>",
+                    'wrapped' => '<pre><code>highlighted</code></pre>',
                     'highlighted' => 'highlighted',
                 ]];
 
@@ -243,7 +241,6 @@ class BaseTest extends TestCase
 
         $this->assertSnapshotMatches('manually-added');
     }
-
 
     /** @test */
     public function test_publish_command()
