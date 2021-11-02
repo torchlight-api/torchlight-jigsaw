@@ -16,39 +16,39 @@ use Torchlight\Torchlight;
 class BlockManager
 {
     /**
-     * @var array
-     */
-    public $blocks = [];
-
-    /**
      * @var Jigsaw
      */
     protected $jigsaw;
 
     /**
+     * @var array
+     */
+    protected $markdownBlocks = [];
+
+    /**
      * @param  Block  $block
      */
-    public function add(Block $block)
+    public function add(Block $block, $markdown = false)
     {
-        $this->blocks[$block->id()] = $block;
+        // Register every block with the BladeManager, even though
+        // some of them will be markdown. Registering them all
+        // through the BladeManager lets developers add blocks
+        // externally, via e.g. Sanity.io.
+        BladeManager::registerBlock($block);
+
+        if ($markdown) {
+            $this->markdownBlocks[] = $block->id();
+        }
     }
 
     public function render(Jigsaw $jigsaw)
     {
         $this->jigsaw = $jigsaw;
 
-        // Merge all of the markdown blocks (the ones in this class)
-        // with any potential blade directive blocks, so that we
-        // can request them all from the API at once.
-        $blocks = array_merge(
-            array_values($this->blocks),
-            array_values(BladeManager::getBlocks())
-        );
-
         // Jigsaw sites can be huge, so we'll split the entirety
         // of the blocks into chunks of 50 since time is not
         // an issue when building locally.
-        $chunks = array_chunk($blocks, 50);
+        $chunks = array_chunk(BladeManager::getBlocks(), 50);
 
         foreach ($chunks as $chunk) {
             Torchlight::highlight($chunk);
@@ -136,7 +136,15 @@ EOT;
                 $torchlightId = head(Torchlight::findTorchlightIds($element));
 
                 /** @var Block $block */
-                if (!$block = Arr::get($this->blocks, $torchlightId)) {
+                if (!$block = Arr::get(BladeManager::getBlocks(), $torchlightId)) {
+                    continue;
+                }
+
+                // Only process markdown blocks in this loop. The check for ##PRE_TL_COMPONENT##
+                // should eliminate all Blade components, but we do allow developers to
+                // register their own blocks, so we need to make sure we're not
+                // mucking about with those at this point.
+                if (!in_array($block->id(), $this->markdownBlocks)) {
                     continue;
                 }
 

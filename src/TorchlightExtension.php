@@ -33,6 +33,8 @@ class TorchlightExtension
 
     public $config = [];
 
+    private static $instance;
+
     /**
      * @param  Container  $container
      * @param  EventBus  $events
@@ -41,7 +43,17 @@ class TorchlightExtension
      */
     public static function make(Container $container, EventBus $events, $config = null)
     {
-        return new static($container, $events, $config);
+        static::$instance = new static($container, $events, $config);
+
+        return static::$instance;
+    }
+
+    /**
+     * @return TorchlightExtension
+     */
+    public static function instance()
+    {
+        return static::$instance;
     }
 
     /**
@@ -65,6 +77,31 @@ class TorchlightExtension
         $this->hookIntoMarkdownParser();
         $this->registerFinalRenderFunction();
         $this->registerBladeComponent();
+    }
+
+    /**
+     * @param $code
+     * @param $language
+     * @return Block
+     */
+    public function createBlock($code, $language)
+    {
+        // Split the language definition into language + theme, as this is
+        // the only way in Jigsaw to specify a custom theme per block.
+        [$language, $theme] = $this->splitLanguageAndTheme($language);
+
+        $block = Block::make()->code($code)->language($language);
+
+        if ($theme) {
+            $block->theme($theme);
+        }
+
+        return $block;
+    }
+
+    public function addBlock(Block $block, $markdown = false)
+    {
+        $this->blocks->add($block, $markdown);
     }
 
     protected function configureStandaloneTorchlight()
@@ -102,6 +139,17 @@ class TorchlightExtension
         // Set an instantiated cache instance.
         Torchlight::setCacheInstance($this->makeFileCache());
 
+        Block::macro('jigsawPlaceholder', function ($id = null) {
+            $id = $id ? " id=\"$id\"" : '';
+
+            return sprintf('<pre><code%s class="%s" style="%s">%s</code></pre>', ...[
+                $id,
+                $this->placeholder('classes'),
+                $this->placeholder('styles'),
+                $this->placeholder()
+            ]);
+        });
+
         if (self::hasMacro('afterStandaloneConfiguration')) {
             $this->afterStandaloneConfiguration();
         }
@@ -124,18 +172,10 @@ class TorchlightExtension
                 '@{!!' => '{!!',
             ]);
 
-            // Split the language definition into language + theme, as this is
-            // the only way in Jigsaw to specify a custom theme per block.
-            [$language, $theme] = $this->splitLanguageAndTheme($language);
-
-            $block = Block::make()->code($code)->language($language);
-
-            if ($theme) {
-                $block->theme($theme);
-            }
+            $block = $this->createBlock($code, $language);
 
             // Add it to our tracker.
-            $this->blocks->add($block);
+            $this->addBlock($block, $markdown = true);
 
             // Leave our placeholder for replacing later.
             return $block->placeholder();
