@@ -5,12 +5,17 @@
 
 namespace Torchlight\Jigsaw\Tests;
 
+use Illuminate\Cache\NullStore;
+use Illuminate\Cache\Repository;
 use Illuminate\Container\Container;
+use Illuminate\Http\Client\Factory;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use TightenCo\Jigsaw\Console\BuildCommand;
 use TightenCo\Jigsaw\Jigsaw;
+use Torchlight\Block;
 use Torchlight\Jigsaw\Exceptions\UnrenderedBlockException;
 use Torchlight\Jigsaw\TorchlightExtension;
 use Torchlight\Torchlight;
@@ -63,6 +68,8 @@ class BaseTest extends TestCase
         $events = $this->container->events;
 
         include "$sitePath/bootstrap.php";
+
+        Http::swap(new Factory);
     }
 
     protected function build($source = 'source-1')
@@ -130,6 +137,7 @@ class BaseTest extends TestCase
         });
 
         $this->prepareForBuilding();
+        Http::fake();
         $this->build('source-2');
 
         // Before the fix, building source-2 would throw an
@@ -148,6 +156,7 @@ class BaseTest extends TestCase
         });
 
         $this->prepareForBuilding();
+        Http::fake();
 
         try {
             $this->build('source-3');
@@ -172,9 +181,65 @@ class BaseTest extends TestCase
         });
 
         $this->prepareForBuilding();
+        Http::fake();
 
         $this->build('source-3');
         $this->assertTrue(true);
+    }
+
+    /** @test */
+    public function can_manually_add_blocks()
+    {
+        TorchlightExtension::macro('afterStandaloneConfiguration', function () {
+            Torchlight::getConfigUsing([
+                'blade_components' => true,
+                'token' => 'token',
+            ]);
+
+            Torchlight::setCacheInstance(new Repository(new NullStore));
+
+            $block = Block::make('id')->code('foo')->language('html');
+
+            TorchlightExtension::instance()->addBlock($block);
+        });
+
+        $this->prepareForBuilding();
+
+        Http::fake([
+            'api.torchlight.dev/*' => function (Request $request) {
+                $response = [[
+                    'id' => 'id',
+                    'classes' => 'torchlight',
+                    'styles' => 'background-color: #000000;',
+                    'wrapped' => '<pre><code>highlighted</code></pre>',
+                    'highlighted' => 'highlighted',
+                ]];
+
+                return Http::response([
+                    'duration' => 100,
+                    'engine' => 1,
+                    'blocks' => $response
+                ], 200);
+            }
+        ]);
+
+        $this->build('source-4');
+
+        Http::assertSentCount(1);
+
+        Http::assertSent(function ($request) {
+            $blocks = $request['blocks'];
+
+            foreach ($blocks as $block) {
+                if ($block['language'] === 'html' && $block['code'] === 'foo') {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+
+        $this->assertSnapshotMatches('manually-added');
     }
 
     /** @test */
