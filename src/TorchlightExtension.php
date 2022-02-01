@@ -184,9 +184,13 @@ class TorchlightExtension
 
     protected function splitLanguageAndTheme($language)
     {
-        $parts = explode(':', $language);
+        $parts = explode(':', $language, 2);
         $language = $parts[0];
         $theme = isset($parts[1]) ? $parts[1] : null;
+
+        if (is_string($theme)) {
+            $theme = str_replace('::',',',$theme);
+        }
 
         return [$language, $theme];
     }

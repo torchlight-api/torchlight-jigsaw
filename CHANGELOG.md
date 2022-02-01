@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- Added the ability to define multiple themes for e.g. dark mode.
+
 ## 0.3.1 - 2021-11-02
 
 ### Added

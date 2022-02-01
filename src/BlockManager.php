@@ -148,25 +148,33 @@ EOT;
                     continue;
                 }
 
-                // ID and class are the only two attributes that the
-                // markdown extension supports, so those are the
-                // only ones we need to carry over.
-                $id = $this->getCapturedGroup('/id="(.+?)"/', $element);
-                $classes = $this->getCapturedGroup('/class="(.+?)"/', $element);
+                $inner = '';
+                // Clones come from multiple themes.
+                $blocks = $block->clones();
+                array_unshift($blocks, $block);
 
-                // To allow Jigsaw authors to specify a theme per block, we have
-                // a convention of `lang:theme`, e.g. `php:github-light`. Here
-                // we need to strip the theme off of the class the the
-                // markdown renderer applies.
-                $classes = $this->replaceThemeFromLanguage($classes);
+                foreach ($blocks as $block) {
+                    // ID and class are the only two attributes that the
+                    // markdown extension supports, so those are the
+                    // only ones we need to carry over.
+                    $id = $this->getCapturedGroup('/id="(.+?)"/', $element);
+                    $classes = $this->getCapturedGroup('/class="(.+?)"/', $element);
 
-                $id = $id ? " id='$id'" : '';
+                    // To allow Jigsaw authors to specify a theme per block, we have
+                    // a convention of `lang:theme`, e.g. `php:github-light`. Here
+                    // we need to strip the theme off of the class the markdown
+                    // renderer applies.
+                    $classes = $this->replaceThemeFromLanguage($classes);
 
-                // User defined classes + Torchlight classes from the API.
-                $classes = trim("$classes $block->classes");
+                    $id = $id ? " id='$id'" : '';
 
+                    // User defined classes + Torchlight classes from the API.
+                    $classes = trim("$classes $block->classes");
+
+                    $inner .= "<code{$id} {$block->attrsAsString()}class='{$classes}' style='{$block->styles}'>{$block->highlighted}</code>";
+                }
                 // Build up a new element.
-                $html = "<pre><code{$id} class='{$classes}' style='{$block->styles}'>{$block->highlighted}</code></pre>";
+                $html = "<pre>$inner</pre>";
 
                 // Finally swap the old element for the new, highlighted one.
                 $contents = str_replace($element, $html, $contents);
@@ -192,7 +200,7 @@ EOT;
 
     protected function replaceThemeFromLanguage($classes)
     {
-        $pattern = '/(language-(?:.+?)):([\w-]+)/';
+        $pattern = '/(language-(?:.+?)):([:\w-]+)/';
 
         preg_match($pattern, $classes, $matches);
 

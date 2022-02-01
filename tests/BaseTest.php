@@ -86,7 +86,7 @@ class BaseTest extends TestCase
         $expected = file_get_contents(__DIR__ . "/snapshots/$file.html");
         $actual = file_get_contents(__DIR__ . "/Site/build_testing/$file.html");
 
-        $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual, "Checking snapshot $file");
     }
 
     /** @test */
@@ -103,7 +103,7 @@ class BaseTest extends TestCase
 
         Http::fake();
 
-        $this->build();
+        $this->build('source-1');
 
         Http::assertSentCount(1);
 
@@ -241,6 +241,83 @@ class BaseTest extends TestCase
 
         $this->assertSnapshotMatches('manually-added');
     }
+
+    /** @test */
+    public function dark_mode_works()
+    {
+        TorchlightExtension::macro('afterStandaloneConfiguration', function () {
+            Torchlight::getConfigUsing([
+                'blade_components' => true,
+                'token' => 'token',
+                'theme' => [
+                    'dark' => 'github-dark',
+                    'light' => 'github-light'
+                ]
+            ]);
+
+            Torchlight::setCacheInstance(new Repository(new NullStore));
+
+            $ids = [
+                'block_id_1',
+                'block_id_2',
+            ];
+
+            Block::$generateIdsUsing = function () use (&$ids) {
+                return array_shift($ids);
+            };
+        });
+
+        $this->prepareForBuilding();
+
+        $response = [
+            'blocks' => [[
+                'id' => 'block_id_1',
+                'attrs' => [
+                    'data-theme' => 'dark',
+                ],
+                'highlighted' => 'dark 1',
+            ], [
+                'id' => 'block_id_1_clone_0',
+                'attrs' => [
+                    'data-theme' => 'light',
+                ],
+                'highlighted' => 'light 1',
+            ],[
+                'id' => 'block_id_2',
+                'attrs' => [
+                    'data-theme' => 'dark',
+                ],
+                'highlighted' => 'dark 2',
+            ], [
+                'id' => 'block_id_2_clone_0',
+                'attrs' => [
+                    'data-theme' => 'light',
+                ],
+                'highlighted' => 'light 2',
+            ]]
+        ];
+
+        Http::fake([
+            'api.torchlight.dev/*' => Http::response($response),
+        ]);
+
+        $this->build('source-5');
+
+        Http::assertSentCount(1);
+
+        Http::assertSent(function ($request) {
+            return count($request['blocks']) === 4
+                && $request['blocks'][0]['theme'] === 'dark:theme1'
+                && $request['blocks'][2]['theme'] === 'light:theme2'
+
+                && $request['blocks'][1]['theme'] === 'dark:github-dark'
+                && $request['blocks'][3]['theme'] === 'light:github-light';
+        });
+
+        $this->assertSnapshotMatches('dark-mode');
+        $this->assertSnapshotMatches('manual-dark-mode');
+    }
+
 
     /** @test */
     public function test_publish_command()

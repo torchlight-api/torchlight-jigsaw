@@ -13,7 +13,7 @@
     ],
     "require": {
         "tightenco/jigsaw": "^1.3.27",
-        "torchlight/torchlight-laravel": "^0.5.7"
+        "torchlight/torchlight-laravel": "dev-main"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.4"
