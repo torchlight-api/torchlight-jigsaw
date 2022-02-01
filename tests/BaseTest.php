@@ -282,7 +282,7 @@ class BaseTest extends TestCase
                     'data-theme' => 'light',
                 ],
                 'highlighted' => 'light 1',
-            ],[
+            ], [
                 'id' => 'block_id_2',
                 'attrs' => [
                     'data-theme' => 'dark',
@@ -317,7 +317,6 @@ class BaseTest extends TestCase
         $this->assertSnapshotMatches('dark-mode');
         $this->assertSnapshotMatches('manual-dark-mode');
     }
-
 
     /** @test */
     public function test_publish_command()

@@ -189,7 +189,7 @@ class TorchlightExtension
         $theme = isset($parts[1]) ? $parts[1] : null;
 
         if (is_string($theme)) {
-            $theme = str_replace('::',',',$theme);
+            $theme = str_replace('::', ',', $theme);
         }
 
         return [$language, $theme];
