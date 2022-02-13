@@ -202,7 +202,7 @@ EOT;
     {
         $pattern = '/(language-(?:.+?)):([:\w-]+)/';
 
-        preg_match($pattern, $classes, $matches);
+        preg_match($pattern, $classes ?? '', $matches);
 
         if (count($matches) === 3) {
             $classes = str_replace($matches[0], $matches[1], $classes);
@@ -225,7 +225,7 @@ EOT;
         // Recursively look for any blocks in the output
         // directory, returning only the paths.
         $output = explode(
-            "\n", trim(shell_exec("grep -l -r __torchlight-block- {$this->jigsaw->getDestinationPath()}/*"))
+            "\n", trim(shell_exec("grep -l -r __torchlight-block- {$this->jigsaw->getDestinationPath()}/*") ?? '')
         );
 
         // Filter out empty values caused by our grep query.
