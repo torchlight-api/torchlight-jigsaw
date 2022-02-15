@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.3.3 - 2022-02-15
+
+### Fixed
+
+- Fixes for PHP 8.1
+
 ## 0.3.2 - 2022-02-01
 
 ### Added
