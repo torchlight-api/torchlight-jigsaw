@@ -96,6 +96,8 @@ class TorchlightExtension
             $block->theme($theme);
         }
 
+        dump($block->theme);
+
         return $block;
     }
 
