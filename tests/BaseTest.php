@@ -10,6 +10,7 @@ use Illuminate\Cache\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
@@ -307,15 +308,14 @@ class BaseTest extends TestCase
 
         Http::assertSent(function ($request) {
             return count($request['blocks']) === 4
-                && $request['blocks'][0]['theme'] === 'dark:theme1'
-                && $request['blocks'][2]['theme'] === 'light:theme2'
-
-                && $request['blocks'][1]['theme'] === 'dark:github-dark'
-                && $request['blocks'][3]['theme'] === 'light:github-light';
+                && $request['blocks'][0]['theme'] === 'dark:github-dark'
+                && $request['blocks'][2]['theme'] === 'light:github-light'
+                
+                && $request['blocks'][1]['theme'] === 'dark:theme1'
+                && $request['blocks'][3]['theme'] === 'light:theme2';
         });
 
         $this->assertSnapshotMatches('dark-mode');
-        $this->assertSnapshotMatches('manual-dark-mode');
     }
 
     /** @test */
