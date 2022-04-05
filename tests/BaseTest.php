@@ -306,6 +306,8 @@ class BaseTest extends TestCase
         Http::assertSentCount(1);
 
         Http::assertSent(function ($request) {
+            dump($request);
+
             return count($request['blocks']) === 4
                 && $request['blocks'][0]['theme'] === 'dark:theme1'
                 && $request['blocks'][2]['theme'] === 'light:theme2'
