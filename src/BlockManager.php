@@ -46,7 +46,7 @@ class BlockManager
         $this->jigsaw = $jigsaw;
 
         // Jigsaw sites can be huge, so we'll split the entirety
-        // of the blocks into chunks of 50 since time is not
+        // of the blocks into chunks of 20 since time is not
         // an issue when building locally.
         $chunks = array_chunk(BladeManager::getBlocks(), 20);
 
