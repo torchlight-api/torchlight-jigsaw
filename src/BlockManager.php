@@ -48,7 +48,7 @@ class BlockManager
         // Jigsaw sites can be huge, so we'll split the entirety
         // of the blocks into chunks of 50 since time is not
         // an issue when building locally.
-        $chunks = array_chunk(BladeManager::getBlocks(), 50);
+        $chunks = array_chunk(BladeManager::getBlocks(), 20);
 
         foreach ($chunks as $chunk) {
             Torchlight::highlight($chunk);
